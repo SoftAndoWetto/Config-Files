@@ -1,0 +1,113 @@
+# ╔══════════════════════════════════════════════════════════╗
+# ║  Starship Prompt — Pentest Edition (Plain, no glyphs)     ║
+# ║  Line 1: scope/host/ip | path/git/env                     ║
+# ║  Line 2: state flags | jobs/shlvl | character              ║
+# ╚══════════════════════════════════════════════════════════╝
+
+add_newline = true
+
+format = """
+${custom.scope}$username $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context$python${custom.vpn}${custom.proxy}${custom.tmux}
+${custom.vpn}${custom.proxy}${custom.root}$jobs${custom.shlvl}$character"""
+
+# ───────────────────────── Identity ─────────────────────────
+[username]
+style_user = "bold fg:#A200FF"
+style_root = "bold red"
+format = "[$user]($style)"
+show_always = true
+
+[hostname]
+ssh_only = false
+style    = "bold white"
+format   = "[$hostname]($style)"
+disabled = false
+
+[localip]
+ssh_only = false
+style    = "bold cyan"
+format   = "[@$localipv4]($style) "
+disabled = false
+
+[custom.ssh]
+when = "test -n \"$SSH_CONNECTION\""
+command = "echo ' [SSH]'"
+style = "bold fg:#FF8700"
+format = "[$output]($style) "
+shell = ["bash", "--noprofile", "--norc"]
+
+# ─────────────────────── Location (right) ───────────────────
+
+[directory]
+style              = "bold white"
+repo_root_style    = "bold green"
+truncation_length  = 3
+truncate_to_repo   = false
+read_only          = " [locked]"
+format             = "[$path]($style)[$read_only](bold red) "
+repo_root_format   = "[$before_root_path]($style)[$repo_root]($repo_root_style)[$path]($style)[$read_only](bold red) "
+
+# ────────────────────── VCS / Environment ────────────────────
+
+[git_branch]
+symbol = "git:"
+style  = "bold white"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style  = "bold red"
+format = "([$all_status$ahead_behind]($style)) "
+
+[docker_context]
+symbol          = "docker:"
+style           = "bold white"
+format          = "[$symbol$context]($style) "
+disabled        = false
+only_with_files = true
+
+[python]
+symbol = "py:"
+style  = "bold white"
+format = '[${symbol}${pyenv_prefix}(${version})(\($virtualenv\))]($style) '
+
+# ──────────────────────── Pentest extras ─────────────────────
+[custom.proxy]
+when    = "test -n \"$HTTP_PROXY\" -o -n \"$http_proxy\""
+command = "echo proxy:on"
+style   = "bold cyan"
+format  = "[$output]($style) "
+shell   = ["bash", "--noprofile", "--norc"]
+
+[custom.root]
+when    = "test $(id -u) -eq 0"
+command = "echo r"
+style   = "bold red"
+format  = "[$output]($style) "
+shell   = ["bash", "--noprofile", "--norc"]
+
+[custom.shlvl]
+when    = "test $((SHLVL-1)) -gt 1"
+command = "echo depth:$((SHLVL-1))"
+style   = "bold cyan"
+format  = "[$output]($style) "
+shell   = ["bash", "--noprofile", "--norc"]
+
+[custom.scope]
+when    = "test -n \"$DOMAIN\""
+command = "echo [$DOMAIN]"
+style   = "bold white"
+format  = "[$output]($style) "
+shell   = ["bash", "--noprofile", "--norc"]
+
+[jobs]
+symbol           = "jobs:"
+style            = "bold cyan"
+number_threshold = 1
+format           = "[$symbol$number]($style) "
+
+# ─────────────────────── Prompt character ────────────────────
+
+[character]
+success_symbol = "[>](bold green)"
+error_symbol   = "[>](bold red)"
+vimcmd_symbol  = "[<](bold green)"

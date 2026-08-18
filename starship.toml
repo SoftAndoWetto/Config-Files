@@ -8,7 +8,7 @@ add_newline = true
 
 format = """
 ${custom.scope}$username $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context$python${custom.vpn}${custom.proxy}${custom.tmux}
-${custom.vpn}${custom.proxy}${custom.root}$jobs${custom.shlvl}$character"""
+${custom.vpn}${custom.proxy}$jobs${custom.shlvl}$character"""
 
 # ───────────────────────── Identity ─────────────────────────
 [username]
@@ -75,13 +75,6 @@ format = '[${symbol}${pyenv_prefix}(${version})(\($virtualenv\))]($style) '
 when    = "test -n \"$HTTP_PROXY\" -o -n \"$http_proxy\""
 command = "echo proxy:on"
 style   = "bold cyan"
-format  = "[$output]($style) "
-shell   = ["bash", "--noprofile", "--norc"]
-
-[custom.root]
-when    = "test $(id -u) -eq 0"
-command = "echo r"
-style   = "bold red"
 format  = "[$output]($style) "
 shell   = ["bash", "--noprofile", "--norc"]
 

@@ -81,7 +81,7 @@ format  = "[$output]($style) "
 shell   = ["bash", "--noprofile", "--norc"]
 
 [custom.shlvl]
-when    = "test $((SHLVL-1)) -gt 1"
+when    = 'test $((SHLVL-1)) -gt 1 && test -z "$TMUX"'
 command = "echo depth:$((SHLVL-1))"
 style   = "bold cyan"
 format  = "[$output]($style) "

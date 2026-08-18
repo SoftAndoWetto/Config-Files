@@ -39,13 +39,15 @@ shell = ["bash", "--noprofile", "--norc"]
 # ─────────────────────── Location (right) ───────────────────
 
 [directory]
-style              = "bold white"
-repo_root_style    = "bold green"
-truncation_length  = 3
-truncate_to_repo   = false
-read_only          = " [locked]"
-format             = "[$path]($style)[$read_only](bold red) "
-repo_root_format   = "[$before_root_path]($style)[$repo_root]($repo_root_style)[$path]($style)[$read_only](bold red) "
+style             = "bold fg:white"
+repo_root_style   = "bold fg:green"
+truncation_length = 3
+truncate_to_repo  = false
+read_only         = "  locked"
+read_only_style   = "bold fg:red"
+home_symbol       = "~"
+format            = "[$path]($style)[$read_only]($read_only_style) "
+repo_root_format  = "[$before_root_path]($style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) "
 
 # ────────────────────── VCS / Environment ────────────────────
 

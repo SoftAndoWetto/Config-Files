@@ -1,14 +1,16 @@
 # ╔══════════════════════════════════════════════════════════╗
 # ║  Starship Prompt — Pentest Edition (Plain, no glyphs)     ║
 # ║  Line 1: scope/host/ip | path/git/env                     ║
-# ║  Line 2: state flags | jobs/shlvl | character              ║
+# ║  Line 2: state flags | jobs/shlvl | fill | duration/status ║
+# ║  Line 3: character                                         ║
 # ╚══════════════════════════════════════════════════════════╝
 
 add_newline = true
 
 format = """
 ${custom.scope}$username $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context$python${custom.vpn}${custom.proxy}${custom.tmux}
-${custom.vpn}${custom.proxy}$jobs${custom.shlvl}$character"""
+${custom.vpn}${custom.proxy}$jobs$fill$cmd_duration$status
+$character"""
 
 # ───────────────────────── Identity ─────────────────────────
 [username]
@@ -49,6 +51,24 @@ home_symbol       = "~"
 format            = "[$path]($style)[$read_only]($read_only_style) "
 repo_root_format  = "[$before_root_path]($style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) "
 
+# ─────────────────────── Timing / exit state ─────────────────
+# Right-aligned via $fill in the format string above.
+[fill]
+symbol = " "
+style  = "bold black"
+
+[cmd_duration]
+min_time = 2000
+style  = "bold yellow"
+format = "[took $duration]($style) "
+
+[status]
+disabled       = false
+success_symbol = ""
+symbol         = "exit:"
+style          = "bold red"
+format         = "[$symbol$status]($style) "
+
 # ────────────────────── VCS / Environment ────────────────────
 
 [git_branch]
@@ -76,13 +96,6 @@ format = '[${symbol}${pyenv_prefix}(${version})(\($virtualenv\))]($style) '
 [custom.proxy]
 when    = "test -n \"$HTTP_PROXY\" -o -n \"$http_proxy\""
 command = "echo proxy:on"
-style   = "bold cyan"
-format  = "[$output]($style) "
-shell   = ["bash", "--noprofile", "--norc"]
-
-[custom.shlvl]
-when    = 'test $((SHLVL-1)) -gt 1 && test -z "$TMUX"'
-command = "echo depth:$((SHLVL-1))"
 style   = "bold cyan"
 format  = "[$output]($style) "
 shell   = ["bash", "--noprofile", "--norc"]

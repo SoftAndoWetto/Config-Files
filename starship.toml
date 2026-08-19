@@ -8,9 +8,8 @@
 add_newline = true
 
 format = """
-${custom.scope}$username $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context$python${custom.vpn}${custom.proxy}${custom.tmux}
-${custom.vpn}${custom.proxy}$jobs$fill$cmd_duration$status
-$character"""
+ ${custom.kerb_valid}${custom.kerb_expired}${python}${custom.scope}$username | $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context${custom.tmux}$fill$cmd_duration$status
+ ${custom.vpn}${custom.proxy}$jobs$character"""
 
 # ───────────────────────── Identity ─────────────────────────
 [username]
@@ -112,6 +111,25 @@ symbol           = "jobs:"
 style            = "bold cyan"
 number_threshold = 1
 format           = "[$symbol$number]($style) "
+
+# ──────────────────────── Kerberos TGT ───────────────────────
+# Valid ticket: green, shows expiry. Gated on $DOMAIN so it only
+# appears during AD engagements — keeps your non-AD shell clean.
+[custom.kerb_valid]
+when    = "test -n \"$DOMAIN\" && klist -s 2>/dev/null"
+command = "echo \"kerb:$(klist 2>/dev/null | awk '/krbtgt/{print $3, $4; exit}')\""
+style   = "bold green"
+format  = "[$output]($style) "
+shell   = ["bash", "--noprofile", "--norc"]
+
+# Expired / no ticket during an AD engagement: red, so a lapsed
+# TGT is impossible to miss before you reach for impacket.
+[custom.kerb_expired]
+when    = "test -n \"$DOMAIN\" && ! klist -s 2>/dev/null"
+command = "echo \"kerb:expired\""
+style   = "bold red"
+format  = "[$output]($style) "
+shell   = ["bash", "--noprofile", "--norc"]
 
 # ─────────────────────── Prompt character ────────────────────
 

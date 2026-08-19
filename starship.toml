@@ -8,7 +8,7 @@
 add_newline = true
 
 format = """
-${custom.kerb_valid}${custom.kerb_expired}${python}${custom.scope}$username | $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context${custom.tmux}$fill$cmd_duration$status${custom.vpn}${custom.proxy}$jobs
+${custom.kerb_valid}${custom.kerb_expired}${python}${custom.scope}$username | $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context$fill$cmd_duration$status${custom.vpn}${custom.proxy}$jobs
 $character"""
 
 # ───────────────────────── Identity ─────────────────────────

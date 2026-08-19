@@ -8,7 +8,7 @@
 add_newline = true
 
 format = """
-${custom.kerb_valid}${custom.kerb_expired}${python}${custom.scope}$username | $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context$fill$cmd_duration$status${custom.vpn}${custom.proxy}$jobs
+${custom.kerb_valid}${custom.kerb_expired}${python}${custom.scope}$username | $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context${custom.ligolo}${custom.shlvl}$fill$cmd_duration$status${custom.proxy}$jobs
 $character"""
 
 # ───────────────────────── Identity ─────────────────────────
@@ -36,6 +36,13 @@ command = "echo ' [SSH]'"
 style = "bold fg:#FF8700"
 format = "[$output]($style) "
 shell = ["bash", "--noprofile", "--norc"]
+
+[custom.ligolo]
+when    = "ip link show 2>/dev/null | grep -qi 'ligolo'"
+command = "ip -4 addr show 2>/dev/null | awk '/ligolo/{f=1} f && /inet /{print $2; exit}'"
+style   = "bold fg:#AF00FF"
+format  = "[ligolo:$output]($style) "
+shell   = ["bash", "--noprofile", "--norc"]
 
 # ─────────────────────── Location (right) ───────────────────
 
@@ -67,6 +74,17 @@ success_symbol = ""
 symbol         = "exit:"
 style          = "bold red"
 format         = "[$symbol$status]($style) "
+
+[shlvl]
+disabled = true
+
+[custom.shlvl]
+shell    = ["bash", "--noprofile", "--norc"]
+when     = 'lvl=${SHELL_DEPTH:-1}; [ -n "$TMUX" ] && lvl=$((lvl - 1)); [ "$lvl" -ge 2 ]'
+command  = 'lvl=${SHELL_DEPTH:-1}; [ -n "$TMUX" ] && lvl=$((lvl - 1)); echo "$lvl"'
+style    = "bold fg:red"
+format   = "[shlvl:$output]($style) "
+disabled = false
 
 # ────────────────────── VCS / Environment ────────────────────
 

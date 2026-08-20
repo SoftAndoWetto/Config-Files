@@ -7,8 +7,7 @@
 
 add_newline = true
 
-format = """
-${custom.kerb_valid}${custom.kerb_expired}${python}${custom.scope}$username | $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context${custom.ligolo}${custom.shlvl}$fill$cmd_duration$status${custom.proxy}$jobs
+format = """${custom.kerb_valid}${custom.kerb_expired}${python} | ${custom.scope}$username | $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context${custom.ligolo}${custom.shlvl}$fill$cmd_duration$status${custom.proxy}$jobs
 $character"""
 
 # ───────────────────────── Identity ─────────────────────────
@@ -36,13 +35,6 @@ command = "echo ' [SSH]'"
 style = "bold fg:#FF8700"
 format = "[$output]($style) "
 shell = ["bash", "--noprofile", "--norc"]
-
-[custom.ligolo]
-when    = "ip link show 2>/dev/null | grep -qi 'ligolo'"
-command = "ip -4 addr show 2>/dev/null | awk '/ligolo/{f=1} f && /inet /{print $2; exit}'"
-style   = "bold fg:#AF00FF"
-format  = "[ligolo:$output]($style) "
-shell   = ["bash", "--noprofile", "--norc"]
 
 # ─────────────────────── Location (right) ───────────────────
 
@@ -74,17 +66,6 @@ success_symbol = ""
 symbol         = "exit:"
 style          = "bold red"
 format         = "[$symbol$status]($style) "
-
-[shlvl]
-disabled = true
-
-[custom.shlvl]
-shell    = ["bash", "--noprofile", "--norc"]
-when     = 'lvl=${SHELL_DEPTH:-1}; [ -n "$TMUX" ] && lvl=$((lvl - 1)); [ "$lvl" -ge 2 ]'
-command  = 'lvl=${SHELL_DEPTH:-1}; [ -n "$TMUX" ] && lvl=$((lvl - 1)); echo "$lvl"'
-style    = "bold fg:red"
-format   = "[shlvl:$output]($style) "
-disabled = false
 
 # ────────────────────── VCS / Environment ────────────────────
 
@@ -135,7 +116,7 @@ format           = "[$symbol$number]($style) "
 # appears during AD engagements — keeps your non-AD shell clean.
 [custom.kerb_valid]
 when    = "test -n \"$DOMAIN\" && klist -s 2>/dev/null"
-command = "echo \"kerb:$(klist 2>/dev/null | awk '/krbtgt/{print $3, $4; exit}')\""
+command = "echo \"KRB:$(klist 2>/dev/null | awk '/krbtgt/{print $3, $4; exit}')\""
 style   = "bold green"
 format  = "[$output]($style) "
 shell   = ["bash", "--noprofile", "--norc"]
@@ -143,8 +124,8 @@ shell   = ["bash", "--noprofile", "--norc"]
 # Expired / no ticket during an AD engagement: red, so a lapsed
 # TGT is impossible to miss before you reach for impacket.
 [custom.kerb_expired]
-when    = "test -n \"$DOMAIN\" && ! klist -s 2>/dev/null"
-command = "echo \"kerb:expired\""
+when    = "test -n \"$DOMAIN\" && klist 2>/dev/null | grep -qi '^Ticket cache' && ! klist -s 2>/dev/null"
+command = "echo \"KRB:expired\""
 style   = "bold red"
 format  = "[$output]($style) "
 shell   = ["bash", "--noprofile", "--norc"]
@@ -155,3 +136,37 @@ shell   = ["bash", "--noprofile", "--norc"]
 success_symbol = "[>](bold green)"
 error_symbol   = "[>](bold red)"
 vimcmd_symbol  = "[<](bold green)"
+
+
+
+
+[custom.ligolo]
+when    = "ip link show 2>/dev/null | grep -qi 'ligolo'"
+command = "ip -4 addr show 2>/dev/null | awk '/ligolo/{f=1} f && /inet /{print $2; exit}'"
+style   = "bold fg:#AF00FF"
+format  = "[ligolo:$output]($style) "
+shell   = ["bash", "--noprofile", "--norc"]
+
+# Disable the built-in shlvl module
+[shlvl]
+disabled = true
+
+
+
+# Custom module — runs under bash (consistent with the rest of the config).
+# Subtracts 1 when inside tmux so tmux never counts toward the depth.
+[custom.shlvl]
+shell    = ["bash", "--noprofile", "--norc"]
+when     = """
+lvl=${SHELL_DEPTH:-1}
+[ -n "$TMUX" ] && lvl=$((lvl - 1))
+[ "$lvl" -ge 2 ]
+"""
+command  = """
+lvl=${SHELL_DEPTH:-1}
+[ -n "$TMUX" ] && lvl=$((lvl - 1))
+echo "$lvl"
+"""
+style    = "bold fg:red"
+format   = "[shlvl:$output]($style) "
+disabled = false

@@ -4,6 +4,38 @@ options:
   remain-on-exit: true
 
 windows:  
+
+
+  - window_name: Nmap_DefPorts
+    panes:
+      - shell_command:
+          - >-
+            cd ~/pentest2026/nmap &&
+            printf '%s\n' "$SUDO_PW" | sudo -S nmap -vvv --max-retries=1 --max-rtt=300ms -Pn
+            -iL ~/pentest2026/nmap/livehosts.txt -oA Scope_Default_nmap_ports;
+            echo $? > nmap_default_exit.txt
+
+
+  - window_name: Nmap_FullPorts
+    panes:
+      - shell_command:
+          - >-
+            cd ~/pentest2026/nmap &&
+            printf '%s\n' "$SUDO_PW" | sudo -S nmap --reason -vvv --max-retries 0 --host-timeout 10m -Pn -p-
+            -iL ~/pentest2026/nmap/livehosts.txt -oA Scope_All_nmap_ports;
+            echo $? > nmap_full_exit.txt
+
+
+  - window_name: Responder
+    panes:
+      - shell_command:
+          - >-
+            cd ~/pentest2026/amin/Responder &&
+            mkdir -p responder_logs &&
+            printf '%s\n' "$SUDO_PW" | sudo -S script -q responder_logs/session.log -c 'responder -I eth0 --lm --disable-ess --basic -PF';
+            echo $? > responder_logs/exit.txt
+            
+            
   - window_name: SMB_Anon
     panes:
       - shell_command:
@@ -17,6 +49,7 @@ windows:
             };
             if [ -f snaffler.db ]; then mv snaffler.db run_logs/snaffler.db;
             else echo 'DB missing' >> run_logs/output.log; fi
+
 
   - window_name: SMB_Auth
     panes:
@@ -32,6 +65,7 @@ windows:
             if [ -f snaffler.db ]; then mv snaffler.db run_logs/snaffler.db;
             else echo 'DB missing' >> run_logs/output.log; fi
 
+
   - window_name: FTP_Anon
     panes:
       - shell_command:
@@ -46,6 +80,7 @@ windows:
             };
             if [ -f snaffler.db ]; then mv snaffler.db run_logs/snaffler.db;
             else echo 'DB missing' >> run_logs/output.log; fi
+
 
   - window_name: FTP_Auth
     panes:

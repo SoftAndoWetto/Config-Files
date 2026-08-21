@@ -1,3 +1,9 @@
+session_name: long_scans
+
+options:
+  remain-on-exit: true
+
+windows:  
   - window_name: SMB_Anon
     panes:
       - shell_command:

@@ -42,7 +42,7 @@ windows:
           - >-
             cd ~/pentest2026/{NAME}/SMB/Snaffler/anonymous &&
             mkdir -p run_logs && {
-              snaffler --rule-dir ~/pentest2026/{NAME}/Snaffler-Rules/Snaffler_Rules
+              snaffler --rule-dir ~/pentest2026/{NAME}/Snaffler-Rules/rules
                 --username '' --password '' --domain {DOMAIN} --dc-host {DC_IP}
                 2>&1 | tee run_logs/output.log;
               echo $? > run_logs/exit.txt;
@@ -57,7 +57,7 @@ windows:
           - >-
             cd ~/pentest2026/{NAME}/SMB/Snaffler/pentest &&
             mkdir -p run_logs && {
-              snaffler --rule-dir ~/pentest2026/{NAME}/Snaffler-Rules/Snaffler_Rules
+              snaffler --rule-dir ~/pentest2026/{NAME}/Snaffler-Rules/rules
                 --username '{DOMAIN_USERNAME}' --password '{PASSWORD}' --domain {DOMAIN} --dc-host {DC_IP}
                 2>&1 | tee run_logs/output.log;
               echo $? > run_logs/exit.txt;
@@ -72,7 +72,7 @@ windows:
           - >-
             cd ~/pentest2026/{NAME}/FTP/Snaffler/anonymous &&
             mkdir -p run_logs && {
-              snaffler --rule-dir ~/pentest2026/{NAME}/Snaffler-Rules/Snaffler_Rules
+              snaffler --rule-dir ~/pentest2026/{NAME}/Snaffler-Rules/rules
                 --username '' --password '' --domain {DOMAIN} --dc-host {DC_IP}
                 --ftp-file ~/pentest2026/{NAME}/livehosts.txt
                 2>&1 | tee run_logs/output.log;
@@ -88,7 +88,7 @@ windows:
           - >-
             cd ~/pentest2026/{NAME}/FTP/Snaffler/pentest &&
             mkdir -p run_logs && {
-              snaffler --rule-dir ~/pentest2026/{NAME}/Snaffler-Rules/Snaffler_Rules
+              snaffler --rule-dir ~/pentest2026/{NAME}/Snaffler-Rules/rules
                 --username '{DOMAIN_USERNAME}' --password '{PASSWORD}' --domain {DOMAIN} --dc-host {DC_IP}
                 --ftp-file ~/pentest2026/{NAME}/livehosts.txt
                 2>&1 | tee run_logs/output.log;

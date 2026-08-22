@@ -64,7 +64,7 @@ elif [ -n "$BASH_VERSION" ]; then
     PROMPT_COMMAND="__chpwd_check${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
 fi
 
-# ---- Cheatsheet function — usage: cs {tmux|fzf|rg|eza|zoxide|bat} ----
+# ---- Cheatsheet function — usage: cs {tmux|fzf} ----
 cs() {
     case "$1" in
         tmux)

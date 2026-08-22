@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+#######################################################################
+# Shared bash/zsh customizations
+# Source this file from ~/.bashrc AND ~/.zshrc — safe in both shells.
+#######################################################################
+
+# ---- Aliases ----
+alias getlivehosts='grep -i "open" | cut -d " " -f 2'
+alias getopenports='grep -io "[0-9]*/open" | cut -d "/" -f 1 | sort -u'
+alias prepareports='tr "\n" ","'
+alias cat="batcat"
+alias grep="rg"
+alias find='fdfind'
+alias ls='eza'
+alias cheatsheet="cs"
+
+# ---- History format ----
+export HISTTIMEFORMAT="%F %T "
+
+# ---- PATH additions ----
+export PATH="$PATH:$HOME/go/bin"
+
+# ---- Starship prompt config ----
+export STARSHIP_CONFIG=/etc/starship/starship.toml
+export SHELL_DEPTH=$(( ${SHELL_DEPTH:-0} + 1 ))
+
+# ---- Shell-specific init (starship + zoxide) ----
+if [ -n "$ZSH_VERSION" ]; then
+    eval "$(starship init zsh)"
+    eval "$(zoxide init --cmd cd zsh)"
+elif [ -n "$BASH_VERSION" ]; then
+    eval "$(starship init bash)"
+    eval "$(zoxide init --cmd cd bash)"
+fi
+
+# ---- Auto venv activation + auto ls on directory change ----
+auto_venv() {
+    if [[ -d .venv ]]; then
+        source .venv/bin/activate
+    elif [[ -d venv ]]; then
+        source venv/bin/activate
+    elif [[ -n "$VIRTUAL_ENV" ]]; then
+        deactivate
+    fi
+}
+
+auto_ls() {
+    eza -l
+}
+
+if [ -n "$ZSH_VERSION" ]; then
+    # zsh has a native directory-change hook
+    chpwd_functions=(auto_venv auto_ls)
+elif [ -n "$BASH_VERSION" ]; then
+    # bash has no chpwd equivalent — emulate it via PROMPT_COMMAND
+    __LAST_PWD="$PWD"
+    __chpwd_check() {
+        if [ "$PWD" != "$__LAST_PWD" ]; then
+            __LAST_PWD="$PWD"
+            auto_venv
+            auto_ls
+        fi
+    }
+    PROMPT_COMMAND="__chpwd_check${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+fi
+
+# ---- Cheatsheet function — usage: cs {tmux|fzf|rg|eza|zoxide|bat} ----
+cs() {
+    case "$1" in
+        tmux)
+            printf "\e[1;36mTmux Commands:\e[0m\n  \e[33mtmux new\e[0m             - Start new Tmux session\n  \e[33mtmux ls\e[0m              - List Tmux sessions\n  \e[33mtmux a -t <NAME>\e[0m     - Attach to session with that name\n\n\e[1;35mControls:\e[0m\n  \e[32mCtrl + b + \$\e[0m         - Rename Session\n  \e[32mCtrl + b + ,\e[0m         - Rename current window\n  \e[32mCtrl + b + d\e[0m         - Detach from session\n  \e[32mCtrl + b + c\e[0m         - Create new window\n  \e[32mCtrl + b + 0...9\e[0m     - Switch/select window by number\n  \e[32mCtrl + b + %%\e[0m         - Split pane vertically (side-by-side)\n  \e[32mCtrl + b + \"\e[0m         - Split pane horizontally (top-and-bottom)\n"
+            ;;
+        fzf)
+            printf "\e[1;36mfzf Commands:\e[0m\n  \e[33mCtrl + r\e[0m             - Fuzzy search command history\n  \e[33mCtrl + t\e[0m             - Fuzzy find file, insert path at cursor\n  \e[33mAlt + c\e[0m              - Fuzzy cd into a subdirectory\n  \e[33mfzf\e[0m                  - Launch interactive finder standalone\n\n\e[1;35mInside fzf:\e[0m\n  \e[32mTab\e[0m                  - Multi-select\n  \e[32mEnter\e[0m                - Confirm selection\n  \e[32mEsc\e[0m                  - Cancel\n"
+            ;;
+        *)
+            printf "\e[1;31mUsage:\e[0m cs {tmux|fzf}\n"
+            ;;
+    esac
+}

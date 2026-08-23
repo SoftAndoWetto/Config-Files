@@ -10,7 +10,7 @@ alias getopenports='grep -io "[0-9]*/open" | cut -d "/" -f 1 | sort -u'
 alias prepareports='tr "\n" ","'
 alias cat="batcat"
 alias grep='rg --hidden --no-ignore'alias find='fdfind'
-alias ls='eza'
+alias ls='eza --git --icons'
 alias cheatsheet="cs"
 
 # ---- History format ----

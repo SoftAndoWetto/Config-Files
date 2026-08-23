@@ -45,7 +45,7 @@ auto_venv() {
 }
 
 auto_ls() {
-    eza -l
+    eza -l --git --icons
 }
 
 if [ -n "$ZSH_VERSION" ]; then

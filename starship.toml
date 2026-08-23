@@ -7,7 +7,7 @@
 
 add_newline = true
 
-format = """${custom.ligolo} | (${custom.kerb_valid}${custom.kerb_expired}$python| )$username | $hostname${custom.localip}${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context${custom.shlvl}$fill$cmd_duration$status${custom.proxy}$jobs
+format = """${custom.ligolo}(${custom.kerb_valid}${custom.kerb_expired}$python)$username | $hostname${custom.localip}${custom.ssh}| $directory$git_branch$git_status$docker_context${custom.shlvl}$fill$cmd_duration$status${custom.proxy}$jobs
 $character"""
 
 # ───────────────────────── Identity ─────────────────────────

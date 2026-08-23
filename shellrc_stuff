@@ -9,8 +9,7 @@ alias getlivehosts='grep -i "open" | cut -d " " -f 2'
 alias getopenports='grep -io "[0-9]*/open" | cut -d "/" -f 1 | sort -u'
 alias prepareports='tr "\n" ","'
 alias cat="batcat"
-alias grep="rg"
-alias find='fdfind'
+alias grep='rg --hidden --no-ignore'alias find='fdfind'
 alias ls='eza'
 alias cheatsheet="cs"
 
@@ -50,7 +49,7 @@ auto_ls() {
 
 if [ -n "$ZSH_VERSION" ]; then
     # zsh has a native directory-change hook
-    chpwd_functions=(auto_venv auto_ls)
+    chpwd_functions+=(auto_venv auto_ls)
 elif [ -n "$BASH_VERSION" ]; then
     # bash has no chpwd equivalent — emulate it via PROMPT_COMMAND
     __LAST_PWD="$PWD"
@@ -87,5 +86,3 @@ if command -v fzf >/dev/null 2>&1; then
         eval "$(fzf --zsh)"
     fi
 fi
-    esac
-}

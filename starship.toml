@@ -115,17 +115,16 @@ format           = "[$symbol$number]($style) "
 # Valid ticket: green, shows expiry. Gated on $DOMAIN so it only
 # appears during AD engagements — keeps your non-AD shell clean.
 [custom.kerb_valid]
-when    = "test -n \"$DOMAIN\" && klist -s 2>/dev/null"
-command = "echo \"KRB:$(klist 2>/dev/null | awk '/krbtgt/{print $3, $4; exit}')\""
+when    = "klist -s 2>/dev/null"
+command = "echo \"$(klist 2>/dev/null | awk -F': ' '/Default principal/{print $2; exit}' | cut -d@ -f1) : $(date -d \"$(klist 2>/dev/null | awk '/krbtgt/{print $3, $4; exit}')\" '+%d/%m %H:%M' 2>/dev/null)\""
 style   = "bold green"
 format  = "[$output]($style) "
 shell   = ["bash", "--noprofile", "--norc"]
 
-# Expired / no ticket during an AD engagement: red, so a lapsed
-# TGT is impossible to miss before you reach for impacket.
+# Expired / no ticket: red, impossible to miss before reaching for impacket.
 [custom.kerb_expired]
-when    = "test -n \"$DOMAIN\" && klist 2>/dev/null | grep -qi '^Ticket cache' && ! klist -s 2>/dev/null"
-command = "echo \"KRB:expired\""
+when    = "klist 2>/dev/null | grep -qi '^Ticket cache' && ! klist -s 2>/dev/null"
+command = "echo \"$(klist 2>/dev/null | awk -F': ' '/Default principal/{print $2; exit}' | cut -d@ -f1) : EXPIRED\""
 style   = "bold red"
 format  = "[$output]($style) "
 shell   = ["bash", "--noprofile", "--norc"]

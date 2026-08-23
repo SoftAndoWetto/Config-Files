@@ -7,7 +7,7 @@
 
 add_newline = true
 
-format = """${custom.ligolo} | (${custom.kerb_valid}${custom.kerb_expired}$python| )${custom.scope}$username | $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context${custom.shlvl}$fill$cmd_duration$status${custom.proxy}$jobs
+format = """${custom.ligolo} | (${custom.kerb_valid}${custom.kerb_expired}$python| $username | $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context${custom.shlvl}$fill$cmd_duration$status${custom.proxy}$jobs
 $character"""
 
 # ───────────────────────── Identity ─────────────────────────
@@ -98,13 +98,6 @@ style   = "bold cyan"
 format  = "[$output]($style) "
 shell   = ["bash", "--noprofile", "--norc"]
 
-[custom.scope]
-when    = "test -n \"$DOMAIN\""
-command = "echo [$DOMAIN]"
-style   = "bold white"
-format  = "[$output]($style) "
-shell   = ["bash", "--noprofile", "--norc"]
-
 [jobs]
 symbol           = "jobs:"
 style            = "bold cyan"
@@ -112,8 +105,6 @@ number_threshold = 1
 format           = "[$symbol$number]($style) "
 
 # ──────────────────────── Kerberos TGT ───────────────────────
-# Valid ticket: green, shows expiry. Gated on $DOMAIN so it only
-# appears during AD engagements — keeps your non-AD shell clean.
 [custom.kerb_valid]
 when    = "klist -s 2>/dev/null"
 command = "echo \"$(klist 2>/dev/null | awk -F': ' '/Default principal/{print $2; exit}' | cut -d@ -f1) : $(date -d \"$(klist 2>/dev/null | awk '/krbtgt/{print $3, $4; exit}')\" '+%d/%m %H:%M' 2>/dev/null)\""

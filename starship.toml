@@ -7,7 +7,7 @@
 
 add_newline = true
 
-format = """(${custom.kerb_valid}${custom.kerb_expired}$python| )${custom.scope}$username | $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context${custom.ligolo}${custom.shlvl}$fill$cmd_duration$status${custom.proxy}$jobs
+format = """${custom.ligolo}(${custom.kerb_valid}${custom.kerb_expired}$python| )${custom.scope}$username | $hostname$localip${custom.ssh}[|](bold white) $directory$git_branch$git_status$docker_context${custom.shlvl}$fill$cmd_duration$status${custom.proxy}$jobs
 $character"""
 
 # ───────────────────────── Identity ─────────────────────────
@@ -142,10 +142,11 @@ vimcmd_symbol  = "[<](bold green)"
 
 [custom.ligolo]
 when    = "ip link show 2>/dev/null | grep -qi 'ligolo'"
-command = "ip -4 addr show 2>/dev/null | awk '/ligolo/{f=1} f && /inet /{print $2; exit}'"
-style   = "bold fg:#AF00FF"
-format  = "[ligolo:$output]($style) "
+command = "ip route show dev ligolo 2>/dev/null | awk '{print $1; exit}'"
+style   = "bold fg:#FFFFFF"
+format  = "[Ligolo \\[$output\\]]($style) | "
 shell   = ["bash", "--noprofile", "--norc"]
+
 
 # Disable the built-in shlvl module
 [shlvl]

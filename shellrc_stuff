@@ -88,3 +88,5 @@ fi
 
 
 bindkey '^T' fzf-file-widget
+
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --preview'batcat {}'"

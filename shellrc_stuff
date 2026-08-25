@@ -111,3 +111,8 @@ if command -v fzf >/dev/null 2>&1; then
     fi
 fi
 export FZF_CTRL_T_OPTS=" --preview'batcat --color=always {}'"
+
+
+
+# ---- Wrpas Netcat with Rlwrap for better reverse shells ----
+alias nc='rlwrap nc'

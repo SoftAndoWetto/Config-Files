@@ -1,9 +1,8 @@
-#!/usr/bin/env bash
+
 #######################################################################
 # Shared bash/zsh customizations
 # Source this file from ~/.bashrc AND ~/.zshrc — safe in both shells.
 #######################################################################
-
 # ---- Aliases ----
 alias getlivehosts='grep -i "open" | cut -d " " -f 2'
 alias getopenports='grep -io "[0-9]*/open" | cut -d "/" -f 1 | sort -u'
@@ -31,12 +30,32 @@ elif [ -n "$BASH_VERSION" ]; then
     eval "$(zoxide init --cmd cd bash)"
 fi
 
-# ---- Auto venv activation + auto ls on directory change ----
+# ---- venv directory detection ----
+_find_venv_dir() {
+    local d
+    if [[ -d .venv ]]; then printf '%s\n' ".venv"; return; fi
+    if [[ -d venv ]]; then printf '%s\n' "venv"; return; fi
+
+    for d in */; do
+        [[ -d "$d" ]] || continue
+        d="${d%/}"
+        [[ "$d" == "." || "$d" == ".." ]] && continue
+        if printf '%s' "$d" | grep -qiE '(^|[._-])venv([._-]|$)'; then
+            printf '%s\n' "$d"
+            return
+        fi
+    done
+}
+
 auto_venv() {
-    if [[ -d .venv ]]; then
-        source .venv/bin/activate
-    elif [[ -d venv ]]; then
-        source venv/bin/activate
+    local venv_dir
+    venv_dir="$(_find_venv_dir)"
+
+    if [[ -n "$venv_dir" && -f "$venv_dir/bin/activate" ]]; then
+        # Don't re-source if we're already in this exact venv.
+        if [[ "$VIRTUAL_ENV" != "$PWD/$venv_dir" ]]; then
+            source "$venv_dir/bin/activate"
+        fi
     elif [[ -n "$VIRTUAL_ENV" ]]; then
         deactivate
     fi
@@ -47,10 +66,12 @@ auto_ls() {
 }
 
 if [ -n "$ZSH_VERSION" ]; then
-    # zsh has a native directory-change hook
-    chpwd_functions+=(auto_venv auto_ls)
+    [[ ${chpwd_functions[(Ie)auto_venv]} -eq 0 ]] && chpwd_functions+=(auto_venv)
+    [[ ${chpwd_functions[(Ie)auto_ls]} -eq 0 ]]   && chpwd_functions+=(auto_ls)
 elif [ -n "$BASH_VERSION" ]; then
-    # bash has no chpwd equivalent — emulate it via PROMPT_COMMAND
+    # bash has no chpwd equivalent — emulate it via PROMPT_COMMAND, but
+    # only install the hook if it isn't already present (covers both
+    # re-sourcing and any accidental inheritance of PROMPT_COMMAND).
     __LAST_PWD="$PWD"
     __chpwd_check() {
         if [ "$PWD" != "$__LAST_PWD" ]; then
@@ -59,7 +80,10 @@ elif [ -n "$BASH_VERSION" ]; then
             auto_ls
         fi
     }
-    PROMPT_COMMAND="__chpwd_check${PROMPT_COMMAND:+; $PROMPT_COMMAND}"
+    case ";${PROMPT_COMMAND};" in
+        *";__chpwd_check;"*) : ;;  # already installed, do nothing
+        *) PROMPT_COMMAND="__chpwd_check${PROMPT_COMMAND:+; $PROMPT_COMMAND}" ;;
+    esac
 fi
 
 # ---- Cheatsheet function — usage: cs {tmux|fzf} ----
@@ -83,10 +107,7 @@ if command -v fzf >/dev/null 2>&1; then
         eval "$(fzf --bash)"
     elif [ -n "$ZSH_VERSION" ]; then
         eval "$(fzf --zsh)"
+        bindkey '^T' fzf-file-widget
     fi
 fi
-
-
-bindkey '^T' fzf-file-widget
-
 export FZF_CTRL_T_OPTS=" --preview'batcat --color=always {}'"

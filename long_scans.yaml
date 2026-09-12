@@ -3,7 +3,7 @@ session_name: long_scans
 options:
   remain-on-exit: true
 
-windows:  
+windows:
 
 
   - window_name: Nmap_DefPorts
@@ -122,3 +122,20 @@ windows:
             mkdir -p mitm6_logs &&
             sudo -S script -q mitm6_logs/session.log -c 'mitm6 -d {DOMAIN} --ignore-nofqdn';
             echo $? > mitm6_logs/exit.txt
+
+
+  - window_name: Nuclei
+    panes:
+      - shell_command:
+          - >-
+            cd ~/pentest2026/amin/HTTP/Nuclei &&
+            mkdir -p nuclei_output && \
+            nuclei -l ~/pentest2026/amin/livehosts.txt -fr \
+              -severity medium,high,critical \
+              -etags bruteforce,dos \
+              -rate-limit 120 -bulk-size 30 -concurrency 30 \
+              -timeout 15 -retries 1 -scan-all-ips -stats -sresp \
+              -srd nuclei_output -project \
+              -o nuclei_results.txt \
+              2>&1 | tee nuclei_run.log; \
+            echo $? > nuclei_exit.txt

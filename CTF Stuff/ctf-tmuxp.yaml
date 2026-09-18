@@ -1,0 +1,58 @@
+# =============================================================================
+#  ctf-tmuxp.yaml  —  tmuxp session template for CTF environments
+#
+#  Usage:
+#    tmuxp load ctf-tmuxp.yaml
+#
+#  Or generate a filled-in version on the fly via ctf-launch.sh (recommended).
+#  This file is a reference/static template — edit SESSION, OVPN_PATH, and
+#  TARGET before loading, or use the shell script which does this automatically.
+# =============================================================================
+
+session_name: HTB                          # <-- change to provider (THM/HTB/OFFSEC)
+
+windows:
+  # ── Window 0: VPN connection ────────────────────────────────────────────────
+  - window_name: VPN
+    layout: main-vertical
+    panes:
+      - shell_command:
+          - sudo openvpn --config ~/.vpns/HTB-CTF.ovpn   # <-- set your ovpn path
+
+  # ── Window 1: Working shell on Desktop ─────────────────────────────────────
+  - window_name: Shell
+    start_directory: ~/Desktop
+    panes:
+      - shell_command:
+          - clear
+
+  # ── Window 2: Nmap (uncomment and fill TARGET when using -t) ───────────────
+  # - window_name: Nmap
+  #   start_directory: ~/Desktop/CTF_NAME/Nmap
+  #   panes:
+  #     - shell_command:
+  #         - >
+  #           until ping -c1 -W2 TARGET_IP &>/dev/null; do sleep 3; done &&
+  #           sudo nmap -sC -sV -p- TARGET_IP -oA CTF_NAME_Nmap
+
+  # ── Window 3: Feroxbuster (uncomment and fill TARGET when using -t) ─────────
+  # - window_name: Ferox
+  #   start_directory: ~/Desktop/CTF_NAME
+  #   panes:
+  #     - shell_command:
+  #         - >
+  #           until ping -c1 -W2 TARGET_IP &>/dev/null; do sleep 3; done &&
+  #           feroxbuster -u http://TARGET_IP
+  #           -w /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt
+  #           -x php,html,txt --extract-links -t 50 --scan-dir-listings
+
+  # ── Window 4: NXC sweeps (uncomment and fill TARGET when using -t) ──────────
+  # - window_name: NXC
+  #   start_directory: ~/Desktop/CTF_NAME/nxc
+  #   panes:
+  #     - shell_command:
+  #         - >
+  #           until ping -c1 -W2 TARGET_IP &>/dev/null; do sleep 3; done &&
+  #           nxc smb TARGET_IP --log smb/anon.log &&
+  #           nxc ldap TARGET_IP --log ldap/anon.log &&
+  #           nxc ftp  TARGET_IP --log ftp/anon.log

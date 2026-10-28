@@ -16,13 +16,32 @@ sudo -v || { echo "[!] sudo required" >&2; exit 1; }
 
 try() { "$@" || FAILED+=("$*"); }
 apt_i() { try sudo apt-get install -y "$@"; }
-# append_once <file> <marker> <text>   (user-owned file)
-append_once() {
-    grep -qF "$2" "$1" 2>/dev/null || printf '%s\n' "$3" >> "$1"
-}
+BLOCK_BEGIN="# >>> SoftAndoWetto shellrc_stuff >>>"
+BLOCK_END="# <<< SoftAndoWetto shellrc_stuff <<<"
+
 # sappend_once <file> <marker> <text>  (root-owned file)
+# Skips if <marker> already appears anywhere in the file.
 sappend_once() {
-    sudo grep -qF "$2" "$1" 2>/dev/null || printf '%s\n' "$3" | sudo tee -a "$1" > /dev/null
+    if sudo grep -qF -- "$2" "$1" 2>/dev/null; then
+        echo "[=] $1: '$2' already present, skipping"
+    else
+        printf '%s\n' "$3" | sudo tee -a "$1" > /dev/null
+    fi
+}
+
+# append_block_once <file> <blockfile>
+# Skips if our markers exist OR every non-blank line of the block is already
+# in the file (covers earlier manual / old-script installs without markers).
+append_block_once() {
+    local f="$1" blk="$2"
+    if grep -qF -- "$BLOCK_BEGIN" "$f" 2>/dev/null; then
+        echo "[=] $f: shellrc_stuff block already present (marker), skipping"
+    elif [ -z "$(grep -v '^[[:space:]]*$' "$blk" | grep -vxFf "$f" 2>/dev/null)" ]; then
+        echo "[=] $f: shellrc_stuff content already present, skipping"
+    else
+        { echo "$BLOCK_BEGIN"; cat "$blk"; echo "$BLOCK_END"; } >> "$f"
+        echo "[+] $f: shellrc_stuff appended"
+    fi
 }
 
 #######################################################################
@@ -41,17 +60,15 @@ try bash -c 'curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/mai
 try sudo usermod -aG docker "$USER"
 
 touch ~/.bashrc ~/.zshrc
-if ! grep -qF "shellrc_stuff" ~/.bashrc ~/.zshrc 2>/dev/null; then
-    TMP_RC="$(mktemp)"
-    if curl -sSfL "$RAW/shellrc_stuff" -o "$TMP_RC"; then
-        for rc in ~/.bashrc ~/.zshrc; do
-            { echo "# --- shellrc_stuff ---"; cat "$TMP_RC"; } >> "$rc"
-        done
-    else
-        FAILED+=("download shellrc_stuff")
-    fi
-    rm -f "$TMP_RC"
+TMP_RC="$(mktemp)"
+if curl -sSfL "$RAW/shellrc_stuff" -o "$TMP_RC" && [ -s "$TMP_RC" ]; then
+    for rc in ~/.bashrc ~/.zshrc; do
+        append_block_once "$rc" "$TMP_RC"
+    done
+else
+    FAILED+=("download shellrc_stuff")
 fi
+rm -f "$TMP_RC"
 
 #######################################################################
 ##################### MODERN CLI REPLACEMENTS #########################

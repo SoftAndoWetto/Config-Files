@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Run as a normal (sudo-capable) user:
-#   curl -sL https://raw.githubusercontent.com/SoftAndoWetto/Config-Files/refs/heads/main/Base/setup.sh | bash
+#   curl -sL https://raw.githubusercontent.com/SoftAndoWetto/Config-Files/refs/heads/main/Base/installation.sh | bash
 set -uo pipefail
 
 RAW="https://raw.githubusercontent.com/SoftAndoWetto/Config-Files/refs/heads/main/Base"
